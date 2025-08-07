@@ -1,0 +1,29 @@
+[unstable]
+codegen-backend = true
+
+
+[target.'cfg(target_os = "linux")']
+linker = "clang"
+rustflags = ["-Zthreads=16", "-Zshare-generics=y", "-Clink-arg=-fuse-ld=mold"]
+
+[target.'cfg(target_os = "macos")']
+rustflags = ["-Zthreads=16", "-Zshare-generics=y"]
+
+[target.'cfg(target_os = "windows")']
+linker = "rust-lld.exe"
+rustflags = ["-Zthreads=16", "-Zshare-generics=y"]
+
+
+[profile.dev]
+opt-level = 1
+codegen-backend = "cranelift"
+
+[profile.dev.package."*"]
+opt-level = 3
+codegen-backend = "llvm"
+
+
+[profile.release]
+debug = "line-tables-only"
+panic = "abort"
+lto = "thin"

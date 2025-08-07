@@ -1,0 +1,22 @@
+[package]
+name = "intercom-cam"
+description = ""
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "process", "fs", "time"] }
+hyper = { workspace = true, features = ["full"] }
+hyper-util.workspace = true
+http-body-util.workspace = true
+webrtc.workspace = true
+bytes.workspace = true
+serde.workspace = true
+serde_json.workspace = true
