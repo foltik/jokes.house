@@ -1,11 +1,7 @@
 //! Intercom remote camera access server.
 //!
-//! FFmpeg transcodes the intercom's RTSP stream into a local RTP stream
-//! suitable for broadcasting. To avoid burning the CPU, we spawn it when the
-//! first viewer connects, and kill it when the last viewer disconnects.
-//!
-//! WebRTC wraps the local RTP stream. This internally creates one SRTP stream
-//! per connected browser, each with their own unique encryption keys.
+//! FFmpeg transcodes the intercom's RTSP stream into a local RTP stream.
+//! WebRTC wraps the local RTP stream, creating one SRTP stream per browser.
 
 mod ffmpeg;
 mod webrtc;
@@ -21,7 +17,7 @@ use crate::webrtc::WebRTC;
 use crate::webrtc::traits::*;
 
 /// URL of the IP camera.
-const CAMERA_STREAM: &str = "rtsp://bastion/live";
+const CAMERA_STREAM: &str = "rtsp://10.16.209.181/live";
 /// URL of the transcoded RTP stream produced by FFmpeg.
 const FFMPEG_STREAM: &str = "127.0.0.1:5004";
 
@@ -30,9 +26,15 @@ const HTML: &[u8] = include_bytes!("index.html");
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let webrtc = Arc::new(WebRTC::new());
+    let public_ip = tokio::net::lookup_host("jokes.house:443").await?.next().unwrap().ip().to_string();
+    eprintln!("Public IP: {public_ip}");
 
-    // Constantly pump the FFmpeg RTP stream into the WebRTC track.
+    let webrtc = Arc::new(WebRTC::new(public_ip).await?);
+
+    // Run FFmpeg forever, restarting on crash/timeout.
+    tokio::spawn(ffmpeg::run());
+
+    // Pump FFmpeg RTP stream into WebRTC track.
     tokio::spawn({
         let track = Arc::clone(&webrtc.track);
         async move {

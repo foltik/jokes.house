@@ -15,10 +15,20 @@
         height: 100%;
         object-fit: contain;
       }
+      #status {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-family: system-ui, sans-serif;
+        font-size: 24px;
+      }
     </style>
   </head>
   <body>
-    <video autoplay playsinline muted controls></video>
+    <div id="status">Connecting...</div>
+    <video id="video" autoplay playsinline muted></video>
     <script>
       (async () => {
         const pc = new RTCPeerConnection({
@@ -27,7 +37,13 @@
 
         pc.addTransceiver("video", { direction: "recvonly" });
         pc.ontrack = (ev) => {
-          document.querySelector("video").srcObject = ev.streams[0];
+          const video = document.getElementById("video");
+          video.srcObject = ev.streams[0];
+          video.play().catch(e => console.error(e));
+
+          const status = document.getElementById("status");
+          status.innerText = "Buffering...";
+          video.addEventListener("loadeddata", () => status.remove());
         };
 
         await pc.setLocalDescription(await pc.createOffer());
