@@ -61,18 +61,6 @@
         const answer = await res.json();
         await pc.setRemoteDescription(answer);
       })();
-
-      let timer = null;
-      document.addEventListener("click", async () => {
-        const status = document.getElementById("status");
-        if (!status) return;
-
-        await fetch("/unlock");
-
-        status.innerText = "Unlocked!";
-        timer && clearTimeout(timer);
-        timer = setTimeout(() => { status.innerText = ""; }, 3000);
-      });
     </script>
   </body>
 </html>

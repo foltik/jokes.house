@@ -12,7 +12,7 @@ categories.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-tokio = { workspace = true, features = ["rt-multi-thread", "macros", "process", "fs", "time"] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "process", "fs", "time", "sync"] }
 hyper = { workspace = true, features = ["full"] }
 hyper-util.workspace = true
 http-body-util.workspace = true
@@ -20,3 +20,4 @@ webrtc.workspace = true
 bytes.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+ffmpeg-next.workspace = true
